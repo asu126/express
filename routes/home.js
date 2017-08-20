@@ -5,10 +5,12 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   // res.render('home', { title: 'home' });
   // res.send('respond with a home');
-  var user={
-    username:'admin',
-    password:'admin'
-  }
+  // var user={
+  //   username:'admin',
+  //   password:'admin'
+  // }
+  var user = req.session.user;
+
   res.render('home', { title: 'Home',user: user});
 });
 

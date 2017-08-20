@@ -11,6 +11,9 @@ var login = require('./routes/login');
 var home = require('./routes/home');
 var logout = require('./routes/logout');
 
+// session
+var session = require("express-session");
+
 var app = express();
 
 // view engine setup
@@ -23,6 +26,23 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// add session
+app.use(session({
+    secret: 'this is the secret for cookie',
+    resave: false,
+    saveUninitialized: true
+}));
+// app.use(function (req, res, next) {
+//     var url = req.originalUrl;
+//     if (url != "/" && undefined == req.session.user) {
+//         // res.send('<script>top.location.href="/login";</script>');　　　　　　//解决内嵌iframe时session拦截问题
+//         // return;
+//         res.redirect('/login');
+//         return;
+//       }
+//     next();
+// });
 app.use(express.static(path.join(__dirname, 'public')));
 
 // routes
