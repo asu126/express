@@ -18,6 +18,8 @@ var flash = require('connect-flash');
 var config = require('config-lite')(__dirname);
 var routes = require('./routes');
 var pkg = require('./package');
+var winston = require('winston');
+var expressWinston = require('express-winston');
 
 var app = express();
 
@@ -27,17 +29,17 @@ app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+// app.use(logger('dev'));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(cookieParser());
 
 // add session
-app.use(session({
-    secret: 'this is the secret for cookie',
-    resave: false,
-    saveUninitialized: true
-}));
+// app.use(session({
+//     secret: 'this is the secret for cookie',
+//     resave: false,
+//     saveUninitialized: true
+// }));
 // app.use(function (req, res, next) {
 //     var url = req.originalUrl;
 //     if (url != "/" && undefined == req.session.user) {
@@ -83,6 +85,7 @@ app.use(function (req, res, next) {
   res.locals.error = req.flash('error').toString();
   next();
 });
+
 // 路由
 routes(app);
 
@@ -103,14 +106,33 @@ routes(app);
 // });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+// app.use(function(err, req, res, next) {
+//   // set locals, only providing error in development
+//   res.locals.message = err.message;
+//   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+//   // render the error page
+//   res.status(err.status || 500);
+//   res.render('error');
+// });
+// 错误请求的日志
+app.use(expressWinston.errorLogger({
+  transports: [
+    new winston.transports.Console({
+      json: true,
+      colorize: true
+    }),
+    new winston.transports.File({
+      filename: 'logs/error.log'
+    })
+  ]
+}));
+
+// error page
+app.use(function (err, req, res, next) {
+  res.render('error', {
+    error: err
+  });
 });
 
 module.exports = app;
